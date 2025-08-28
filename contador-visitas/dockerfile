@@ -1,0 +1,28 @@
+# Usar imagen base recomendada
+FROM python:3.9-slim
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de requerimientos
+COPY requirements.txt .
+
+# Instalar Redis y dependencias Python
+RUN apt-get update && apt-get install -y \
+    redis-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar todos los archivos del proyecto
+COPY . .
+
+# Dar permisos de ejecución al script
+RUN chmod +x start.sh
+
+# Exponer puerto 5000
+EXPOSE 5000
+
+# Comando para ejecutar la aplicación
+CMD ["bash", "-c", "redis-server --daemonize yes && sleep 2 && python app.py"]
